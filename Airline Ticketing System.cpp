@@ -3,7 +3,7 @@
 #include <sstream>
 #define maxFlights 10
 using namespace std;
-//hello
+//write your code after testing
 struct FlightReservations{
 	int number;
 	string destination;
