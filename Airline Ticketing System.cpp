@@ -93,6 +93,30 @@ void printBST(node *root)
 
 int main()
 {
-	
+    int choice;
+
+    do {
+        cout << "\nMenu:\n";
+        cout << "1 - Enter New Customer\n";
+        cout << "2 - Update Existing Customer Information\n";
+        cout << "3 - Add Flight Reservation for Customer\n";
+        cout << "4 - Display All Customer Information\n";
+        cout << "5 - Exit\n";
+        cout << "Your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: 
+            case 2: 
+            case 3: 
+            case 4:
+                
+            case 5:
+                cout << "Exiting the system .. Thank you.\n";
+                break;
+            default:
+                cout << "Invalid choice ,Please try again.\n";
+        }
+    } while (choice != 5);	
     return 0;
 }
