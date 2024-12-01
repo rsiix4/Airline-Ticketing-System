@@ -39,13 +39,60 @@ void displayCustomerFlights (Customer customer);
 
 int inputID();
 int inputAge();
-
-void updateCustomerInfo(Customer customer);
-void updateName(Customer customer);
-void updateAge(Customer customer);
-void updateMobileNumber(Customer customer);
-
-
+void updateName(Customer customer){
+            cout << "Old Name: " << customer->name << endl;
+            cout << "Enter new name: ";
+            getline(cin, customer->name);
+            cout << "Name updated successfully.\n";
+}
+void updateAge(Customer customer){
+            cout << "Old Age: " << customer->age << endl;
+            cout << "Enter new age: ";
+            cin >> customer->age;
+            cout << "Age updated successfully.\n";
+}
+void updateMobileNumber(Customer customer){
+	    cout << "Old Mobile Number: " << customer->mobileNumber << endl;
+            cout << "Enter new mobile number: ";
+            getline(cin, customer->mobileNumber);
+            cout << "Mobile number updated successfully.\n";
+}
+void updateCustomerInfo(Customer customer){
+int choice ; 
+	do
+	{
+	cout << " Choose the item number that you want to update : \n\n" ;
+	cout << "   1- Update the name \n   2- Update the age \n    3- Update the moblieNumber \n    4- Add extra flight   5- Exit" ;
+	cout << "Your chioce : " ;
+	cin >> choice ;
+	cout<<endl ;
+	
+	switch ( choice )
+	{
+		case 1 :
+		updateName(customer) ;
+		break ;
+		
+		case 2 :
+		updateAge(customer);	
+		break;
+		
+		case 3 :
+	        updateMobileNumber(customer) ;
+	        break ;
+		
+	        case 4:
+	        addFlight(customer);
+		break ;	
+		
+		case 5 :
+		 return ; 
+		
+	        default :
+	         cout << "Invalid choice. Please try again.\n";
+	    
+}
+}
 
 //needed for display function
 bool isEmpty(Customer *root){
@@ -108,6 +155,20 @@ int main()
         switch (choice) {
             case 1: 
             case 2: 
+		{
+	   	int id ; 
+                cout <<  "Enter Customer ID to update: ";
+                cin >> id ; 
+            
+                bool cheak = CheckID(id) ;
+                
+                  if(cheak == true)
+                    updateCustomerInfo(searchCustomer(id));
+                  else
+                    cout << " Customer not exist\n";
+                break ;    
+		        }
+		        
             case 3: 
             case 4:
                 
