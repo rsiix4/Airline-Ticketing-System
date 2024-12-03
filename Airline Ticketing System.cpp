@@ -23,20 +23,56 @@ struct Customer{
 
 Customer addCustomer();
 
-void addFlight(Customer customer);
-
+void addFlight(Customer &customer) {
+    if (customer.flightCounter >= maxFlights) {
+        cout << "Cannot add more flights. Maximum limit reached.\n";
+        return;
+    }
 Customer searchCustomer(int id);
 bool CheckID(int id);
 
 FlightReservation serachFlight(int number);
-bool CheckFlight(FlightReservation flight);
+FlightReservations newFlight;
+    cout << "Enter flight number: ";
+    cin >> newFlight.number;
+    cin.ignore(); // Clear input buffer
 
+    cout << "Enter flight destination: ";
+    getline(cin, newFlight.destination);
+
+    customer.flights[customer.flightCounter] = newFlight;
+    customer.flightCounter++;
+
+    cout << "Flight added successfully.\n";
+}
+bool CheckFlight(FlightReservation flight);
+bool CheckFlight(FlightReservations flight, Customer &customer) {
+    for (int i = 0; i < customer.flightCounter; i++) {
+        if (customer.flights[i].number == flight.number) {
+            return true; // Flight already exists for the customer
+        }
+    }
+
+    return false; // Flight does not exist
+}
 void display1Customer(Customer customer);
 
-void display1Flight (FlightReservation flight);
+void display1Flight(FlightReservations flight) {
+    cout << "Flight Number: " << flight.number << endl;
+    cout << "Destination: " << flight.destination << endl;
+}
+void displayCustomerFlights(Customer customer) {
+    if (customer.flightCounter == 0) {
+        cout << "No flights reserved for this customer.\n";
+        return;
+    }
 
-void displayCustomerFlights (Customer customer);
-
+    cout << "Flights reserved for customer " << customer.name << ":\n";
+    for (int i = 0; i < customer.flightCounter; i++) {
+        cout << "--- Flight " << (i + 1) << " ---\n";
+        display1Flight(customer.flights[i]);
+    }
+}
 int inputID();
 int inputAge();
 void updateName(Customer customer){
