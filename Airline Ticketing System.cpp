@@ -556,7 +556,6 @@ int main()
     int choice;
     int order;
     int id ;
-    Node *searchNode;
 	Customer customer;
 
     do {
