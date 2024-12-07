@@ -373,11 +373,12 @@ Node *getNewNode(Node *root){
 }
 
 //Add a new customer to the Binary search tree
-Node *addCustomer(Node *root){
+void addCustomer(Node *&root){
     Node *newNode = getNewNode(root);
     
     if(isEmpty(root)){
-    	return newNode;
+    	root = newNode;
+    	return;
 	}
     
 	Node *curr = root; //child node
@@ -396,8 +397,6 @@ Node *addCustomer(Node *root){
         prev->left = newNode;
     else//set @ right
         prev->right = newNode;
-        
-    return prev;
 }
 
 //Search for a customer in the Binary search tree by using id
@@ -438,8 +437,7 @@ void display1Flight(FlightReservation flight) {
 
 void displayCustomerFlights(Customer customer) {
 	cout << endl;
-    cout << "Flights reserved for customer ";
-	cout << customer.name << ":" << endl;
+    cout << "Flights reserved for customer " << customer.name << ":" << endl;
     cout << endl;
     
     for(int i = 0; i < customer.flightCounter; i++) {
@@ -469,20 +467,87 @@ void displayAllCustomers(Node *root , int &order){
     displayAllCustomers(root->right, order);
 }
 
+void deleteCustomer(Node *&root, int id){
+	string name;
+    Node *curr = root; //curr :the node we looking to delete
+    Node *prev = NULL; //prev: father of curr
+  
+    while (curr != NULL && curr->customer.id != id){
+        prev = curr; 
+        if (id < curr->customer.id) 
+            curr = curr->left; 
+        else
+            curr = curr->right; 
+    }
+	 
+    if (curr == NULL){ 
+        cout << "Customer with id " << id << " is not found in the System.";
+        deleteText(12,4);
+        return;
+    }
+	
+	name = curr->customer.name;
+	cout << "Customer " << name << " is deleted successfully!" << endl << endl;
+    
+    if (curr->left == NULL || curr->right == NULL)
+	{ 
+        Node* newCurr = NULL;
+       
+        if (curr->left == NULL) 
+            newCurr = curr->right; 
+        else
+            newCurr = curr->left; 
+  
+        if (prev == NULL){
+        	root = newCurr;
+        	return;
+		}
+		
+        if (prev->left == curr) 
+            prev->left = newCurr;
+        else
+            prev->right = newCurr;
+  		
+        delete curr;
+    } 
+    
+    else{ 
+        Node* succParent = NULL; 
+        Node* succ;
+  
+        succ = curr->right;
+        
+        while (succ->left != NULL){ 
+            succParent = succ;
+            succ = succ->left;
+        } 
+        
+		curr->customer = succ->customer;
+		
+        if (succParent != NULL)
+            succParent->left = succ->right; 
+        else
+            curr->right = succ->right;
+            
+        delete succ;
+    }
+}
+
 void emptySystem(){
 	cout << "There is no customer in the system!";
-	deleteText(10,3);	
+	deleteText(11,3);	
 }
 
 void displayMenu(){
-	cout << "_________________Menu_________________" << endl;
-	cout << "1-Enter New Customer" << endl;
-	cout << "2-Update Existing Customer Information" << endl;
-	cout << "3-Display All Customer Information" << endl;
-	cout << "4-Display All Flight Reservations for" << endl;
-	cout << "  specific Customer" << endl;
-	cout << "5-Exit" << endl;
-	cout << "--------------------------------------" << endl;
+	cout << " _________________Main Menu_________________" << endl;
+	cout << "|1. Enter New Customer                      |" << endl;
+	cout << "|2. Update Existing Customer Information    |" << endl;
+	cout << "|3. Delete Customer record                  |" << endl;
+	cout << "|4. Display All Customer Information        |" << endl;
+	cout << "|5. Display All Flight Reservations for     |" << endl;
+	cout << "|   specific Customer                       |" << endl;
+	cout << "|6. Exit                                    |" << endl;
+	cout << "|___________________________________________|" << endl;
 }
 
 int main()
@@ -491,6 +556,7 @@ int main()
     int choice;
     int order;
     int id ;
+    Node *searchNode;
 	Customer customer;
 
     do {
@@ -500,11 +566,8 @@ int main()
 
         switch(choice) {
 			case 1:
-				if(isEmpty(root))
-					root = addCustomer(root);
-				
-				else
-					addCustomer(root);
+				addCustomer(root);
+				cout << endl;
             	break;
             
             case 2:
@@ -519,9 +582,19 @@ int main()
 	   			if(isCorrect(customer.id)){
 	   				updateCustomerInfo(customer);
 	   			}
-	   			continue;
-                
-            case 3: 
+	   			break;
+            
+            case 3:
+            	if(isEmpty(root)){
+	   				emptySystem();
+	   				continue;
+				} 
+				
+	   			id = inputInt("Customer ID to delete");
+            	deleteCustomer(root, id);
+            	break;
+            
+            case 4: 
             	if(isEmpty(root)){
 	   				emptySystem();
 	   				continue;
@@ -529,40 +602,38 @@ int main()
 				
         		order = 1;
         		displayAllCustomers(root, order);
-        		
+        		deleteText(0, 0);
         		cout << "--------------------------------------" << endl;
+        		cout << endl;
             	break;
             	
-            case 4:
+            case 5:
             	if(isEmpty(root)){
 	   				emptySystem();
 	   				continue;
 				}
 				
-	   			id = inputInt("Customer ID to display his flights information");
+				id = inputInt("Customer ID to display his flights information");
 	   			customer = searchCustomer(root, id);
 	   			
-	   			if(!isCorrect(customer.id)){
-	   				continue;
+	   			if(isCorrect(customer.id)){
+	   				displayCustomerFlights(customer);
+		   			cout << "----------------------------" << endl;
+		   			cout << endl;
 				}
-				
-				displayCustomerFlights(customer);
-				deleteText(0, 0);
-	   			cout << "----------------------------" << endl;
 				break;
 	   			
                 
-            case 5:
+            case 6:
                 cout << "Exiting the system .. Thank you.";
-                continue;
+                break;
                 
             default:
                 cout << "Invalid choice ,Please try again.";
-                deleteText(10, 3);
-                continue;
+                deleteText(11, 3);
         }
-        cout << endl;
-    } while (choice != 5);
+        
+    } while (choice != 6);
     
     return 0;
 }
