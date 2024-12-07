@@ -146,7 +146,7 @@ string inputString(string info){
 		getline(cin, input);
 		
 		for(int i = 0; i < input.length(); i++){
-			if(!isalpha(input.at(i))){
+			if(!isalpha(input.at(i)) && input.at(i) != ' '){
 				input.clear();
 				break;
 			}
