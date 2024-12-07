@@ -9,11 +9,13 @@ using namespace std;
 using namespace this_thread;
 using namespace chrono;
 
+//Define the structure of Flight Reservations
 struct FlightReservation{
 	int number;
 	string destination;
 };
 
+//Define the structure of Customers
 struct Customer{
 	string name;
 	int id;
@@ -24,6 +26,7 @@ struct Customer{
 	FlightReservation flights[maxFlights];
 };
 
+//Define the structure of Nodes
 struct Node{
 	Customer customer;
 	Node *left;
@@ -38,7 +41,7 @@ void deleteText(int rows, int time){
 
 	//"\033[nA" is used to move the cursor up n lines
 	//"\r" is used to move the cursor to the beginning of the current line
-	//"\033[J" is used to clear from the cursor o the end of the screen 
+	//"\033[J" is used to clear outputed text from the cursor to the end of the screen 
 	cout << "\033[" << rows << "A" << "\r" << "\033[J";
 }
 
@@ -54,19 +57,22 @@ bool isEmpty(Node *root){
 //checkID duplication
 bool IDExist(Node *root, int id){
 	
+	//If the system is not empty check if there is a customer with the same id entered
 	if(!isEmpty(root)){
 		Node *curr = root;
 		Node *prev = NULL;
 		
 		while (!isEmpty(curr)) 
 		{
+			//check for existing customer with the same id entered
 			if(curr->customer.id == id){
 				cout << "There exist a customer with this ID. Try again!"<< endl;
 				cout << "------------------------" << endl;
-				deleteText(3,2);
+				//delete some text from the screen
+				deleteText(3,4);
 				return true;
 			}
-			
+			// if this node does not contain 
 	        prev = curr;
 	        if (id < curr->customer.id)
 	            curr = curr->left;
@@ -88,22 +94,23 @@ bool isCorrect(int number){
 
 bool FlightExist(FlightReservation flight, Customer &customer){
     for (int i = 0; i < customer.flightCounter; i++) {
+    	
         if (customer.flights[i].number == flight.number) {
         	if(customer.flights[i].destination == flight.destination)
             	return true; // Flight already exists for the customer
         }
+        
     }
-
     return false; // Flight does not exist
 }
 
 //input integer number, such as ID, using exception handling
-int inputInt(string Info){
+int inputInt(string info){
 	string input;
 	int number;
 	
 	do{
-			cout << "Enter " << Info << ": ";
+			cout << "Enter " << info << ": ";
 			getline(cin, input);
 			
 			stringstream(input) >> number;
@@ -113,10 +120,10 @@ int inputInt(string Info){
 			}
 	
 			cout << "Invalid input try again!" << endl;
-			cout << "------------------------" << endl;
+			cout << "------------------------";
 			
 			//erase the last 3 lines from screen before asking the user to enter int again
-			deleteText(3, 2);
+			deleteText(2, 3);
 			
 	}while(true);
 }
@@ -132,9 +139,26 @@ int inputID(Node *root){
 	return id;
 }
 
+string inputString(string info){
+	string input;
+	do{
+		cout << "Enter " << info << " : ";
+		getline(cin, input);
+		
+		if(isalpha(input.at(0))){
+			break;
+		}
+		cout << "Invalid " << info << ". Try again!";
+		
+		deleteText(1,3);
+		
+	}while(true);
+	
+	return input;
+}
+
 void inputName(Customer &customer, string info){
-        cout << "Enter " << info << " Name: ";
-        getline(cin, customer.name);
+        customer.name = inputString(info + " Name");
 }
 
 void inputAge(Customer &customer, string info){
@@ -142,13 +166,13 @@ void inputAge(Customer &customer, string info){
 }
 
 void inputMobileNumber(Customer &customer, string info){
-        cout << "Enter " << info << " mobile number: ";
+        cout << "Enter " << info << " Mobile Number: ";
         getline(cin, customer.mobileNumber);
 }
 
 void updateName(Customer &customer){
             cout << "Old Name: " << customer.name << endl;
-            inputName(customer, "new");
+            inputName(customer, "New");
             cout << "Name updated successfully.\n";
 }
 
@@ -160,7 +184,7 @@ void updateAge(Customer &customer){
 
 void updateMobileNumber(Customer &customer){
 	    cout << "Old Mobile Number: " << customer.mobileNumber << endl;
-        inputMobileNumber(customer, "new");
+	    inputMobileNumber(customer, "new");
         cout << "Mobile number updated successfully.\n";
 }
 
@@ -175,15 +199,14 @@ void add1Flight(Customer &customer){
 	do{
 		cout << "_________Flight " << customer.flightCounter + 1 << " information_________" << endl;
 		newFlight.number = inputInt("flight number");
-
-	    cout << "Enter flight destination: ";
-	    getline(cin, newFlight.destination);
+		
+		newFlight.destination = inputString("Flight destination");
 	    
 	    if(!FlightExist(newFlight, customer))
 	    	break;
 	    	
 	    cout << "Flight already exists for the customer!";
-		deleteText(3, 2);
+		deleteText(3, 3);
 	    
 	}while(FlightExist(newFlight, customer));
     
@@ -205,7 +228,7 @@ bool addMore(){
 				cout << "Invalid input try again!" << endl;
 				cout << "------------------------" << endl;
 				
-				deleteText(4,2);
+				deleteText(4,3);
 				continue;
 			}
 			
@@ -235,7 +258,7 @@ void addExtraFlights(Customer &customer){
 		add1Flight(customer);
 		
 		if(flightCounter + 1 > maxFlights){
-			deleteText(2,2);
+			deleteText(2,3);
 			break;
 		}		
 	}while(true);
@@ -249,9 +272,9 @@ void updateCustomerInfo(Customer &customer){
 	do
 	{
 		cout << "________Update Menu_________" << endl;
-		cout << "1-Update the Name" << endl;
-		cout << "2-Update the Age" << endl;
-		cout << "3-Update the Moblie Number" << endl;
+		cout << "1-Update Name" << endl;
+		cout << "2-Update Age" << endl;
+		cout << "3-Update Moblie Number" << endl;
 		cout << "4-Add extra Flight" << endl;
 		cout << "5-Stop updating" << endl;
 		cout << "----------------------------" << endl;
@@ -276,7 +299,7 @@ void updateCustomerInfo(Customer &customer){
 		    	flightCounter = customer.flightCounter;
 		        add1Flight(customer);
 				if(flightCounter + 1 > maxFlights){
-					deleteText(9,2);
+					deleteText(9,3);
 				}
 				else{
 					cout << endl;
@@ -289,7 +312,7 @@ void updateCustomerInfo(Customer &customer){
 			
 		    default :
 		         cout << "Invalid choice. Please try again.";
-		         deleteText(9,1);
+		         deleteText(9,3);
 		         continue;
 		}
 		cout << "----------------------------" << endl << endl;
@@ -376,7 +399,7 @@ Customer searchCustomer(Node *root, int id){
     if (isEmpty(curr)) //raech null: not found
 	{ 
         cout << "Customer with id " << id << " is not found in the System.";
-        deleteText(11,2);
+        deleteText(11,4);
     }
 	
     return customer;
@@ -470,7 +493,6 @@ int main()
 	   			if(isCorrect(customer.id)){
 	   				updateCustomerInfo(customer);
 	   			}
-	   			
 	   			continue;
                 
             case 3: 
@@ -481,6 +503,7 @@ int main()
 				
         		order = 1;
         		displayAllCustomers(root, order);
+        		
         		cout << "--------------------------------------" << endl;
             	break;
             	
@@ -498,6 +521,7 @@ int main()
 				}
 				
 				displayCustomerFlights(customer);
+				deleteText(0, 0);
 	   			cout << "----------------------------" << endl;
 				break;
 	   			
@@ -508,7 +532,7 @@ int main()
                 
             default:
                 cout << "Invalid choice ,Please try again.";
-                deleteText(10, 2);
+                deleteText(10, 3);
                 continue;
         }
         cout << endl;
