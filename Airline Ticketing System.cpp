@@ -145,11 +145,18 @@ string inputString(string info){
 		cout << "Enter " << info << " : ";
 		getline(cin, input);
 		
-		if(isalpha(input.at(0))){
+		for(int i = 0; i < input.length(); i++){
+			if(!isalpha(input.at(i))){
+				input.clear();
+				break;
+			}
+		}
+		
+		if(!input.empty()){
 			break;
 		}
-		cout << "Invalid " << info << ". Try again!";
 		
+		cout << "Invalid " << info << ". Try again!";
 		deleteText(1,3);
 		
 	}while(true);
@@ -166,8 +173,27 @@ void inputAge(Customer &customer, string info){
 }
 
 void inputMobileNumber(Customer &customer, string info){
-        cout << "Enter " << info << " Mobile Number: ";
-        getline(cin, customer.mobileNumber);
+	string input;
+	do{
+		cout << "Enter " << info << " Mobile Number: ";
+		getline(cin, input);
+		
+		for(int i = 0; i < input.length(); i++){
+			if(!isdigit(input.at(i))){
+				input.clear();
+				break;
+			}
+		}
+		
+		if(!input.empty()){
+			break;
+		}
+		cout << "Invalid Mobile Number. Try again!";
+		deleteText(1,3);
+		
+	}while(true);
+    
+    customer.mobileNumber= input;
 }
 
 void updateName(Customer &customer){
