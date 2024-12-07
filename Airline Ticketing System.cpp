@@ -86,7 +86,7 @@ bool isCorrect(int number){
 		return true;
 }
 
-bool FlightExist(FlightReservation flight, Customer &customer) {
+bool FlightExist(FlightReservation flight, Customer &customer){
     for (int i = 0; i < customer.flightCounter; i++) {
         if (customer.flights[i].number == flight.number) {
         	if(customer.flights[i].destination == flight.destination)
@@ -99,32 +99,26 @@ bool FlightExist(FlightReservation flight, Customer &customer) {
 
 //input integer number, such as ID, using exception handling
 int inputInt(string Info){
+	string input;
 	int number;
 	
 	do{
-			// cin.sync() can be used to discard all unread characters from the input buffer. 
-			cin.sync();
 			cout << "Enter " << Info << ": ";
-			cin >> number;
+			getline(cin, input);
 			
-			//cin.fail() returns true if the entered value does not fit the variable(not acceptable for the variable type)
-			if(cin.fail() || !isCorrect(number)){
-				//cin.clear() clears the error flag in cin, so next inputs can be taken without problems
-				cin.clear();
-				cout << "Invalid input try again!" << endl;
-				cout << "------------------------";
-				
-				//erase the last 3 lines from screen before asking the user to enter int again
-				deleteText(2, 2);
-				continue;
+			stringstream(input) >> number;
+						
+			if(isCorrect(number)){
+				return number;
 			}
+	
+			cout << "Invalid input try again!" << endl;
+			cout << "------------------------" << endl;
 			
-			cin.sync();
-			return number;
+			//erase the last 3 lines from screen before asking the user to enter int again
+			deleteText(3, 2);
 			
 	}while(true);
-	
-	
 }
 
 //input ID and check for duplication, until the id is unique
@@ -170,10 +164,10 @@ void updateMobileNumber(Customer &customer){
         cout << "Mobile number updated successfully.\n";
 }
 
-void addFlight(Customer &customer) {
+void add1Flight(Customer &customer){
 	
     if (customer.flightCounter == maxFlights) {
-        cout << "Cannot add more flights. Maximum limit reached." << endl;
+        cout << "Cannot add more flights. Maximum limit reached.";
         return;
     }
     
@@ -199,6 +193,52 @@ void addFlight(Customer &customer) {
 
     cout << "Flight " << customer.flightCounter << " is added successfully." << endl;
     cout << "--------------------------------------" << endl;
+}
+
+bool addMore(){
+	int choice;
+	do{
+			cout << "Do you want to add another flight?" << endl;
+			choice = inputInt("1 for yes, 2 for no");
+			
+			if(choice != 1 && choice != 2){
+				cout << "Invalid input try again!" << endl;
+				cout << "------------------------" << endl;
+				
+				deleteText(4,2);
+				continue;
+			}
+			
+			deleteText(2,0);
+			
+			if(choice == 1)
+				return true;
+			else{
+				deleteText(0,0);
+				return false;
+			}
+				
+							
+		}while(true);
+}
+
+void addExtraFlights(Customer &customer){
+	
+	int flightCounter;
+	do{
+		cout << endl;
+		
+		if(!addMore())
+			break;
+			
+		flightCounter = customer.flightCounter;
+		add1Flight(customer);
+		
+		if(flightCounter + 1 > maxFlights){
+			deleteText(2,2);
+			break;
+		}		
+	}while(true);
 }
 
 void updateCustomerInfo(Customer &customer){
@@ -234,16 +274,17 @@ void updateCustomerInfo(Customer &customer){
 			
 		    case 4:
 		    	flightCounter = customer.flightCounter;
-		        addFlight(customer);
+		        add1Flight(customer);
 				if(flightCounter + 1 > maxFlights){
-					deleteText(10,2);
+					deleteText(9,2);
 				}
-				else
-		        	deleteText(0,0);
-				break ;	
+				else{
+					cout << endl;
+				}
+				continue;	
 			
 			case 5 :
-				deleteText(1,0);
+				deleteText(9,0);
 				return;			  
 			
 		    default :
@@ -251,8 +292,7 @@ void updateCustomerInfo(Customer &customer){
 		         deleteText(9,1);
 		         continue;
 		}
-		cout << "----------------------------" << endl;
-		cout << endl;
+		cout << "----------------------------" << endl << endl;
 	}while(choice != 5);
 }
 
@@ -276,42 +316,15 @@ Node *getNewNode(Node *root){
 	
 	inputMobileNumber(newCustomer->customer, "Customer");
 	
-	int choice;
-	int flightCounter;
-	do{
-		cout << endl;
-		flightCounter = newCustomer->customer.flightCounter;
-		addFlight(newCustomer->customer);
-		
-		if(flightCounter + 1 > maxFlights){
-			deleteText(2,2);
-			break;
-		}
-			
-		do{
-			cout << "Do you want to add flight?" << endl;
-			choice = inputInt("1 for yes, 2 for no");
-			
-			if(choice == 1 || choice == 2){
-				break;
-			}
-			
-			cout << "Invalid input try again!" << endl;
-			cout << "------------------------" << endl;
-			
-			deleteText(4,2);
-		}while(choice != 1 && choice != 2);
-		
-		deleteText(2,0);
-		
-	}while(choice == 1);
+	cout << endl;
+	add1Flight(newCustomer->customer);
+	addExtraFlights(newCustomer->customer);
 	
 	return newCustomer;
 }
 
 //Add a new customer to the Binary search tree
-Node *addCustomer(Node *root) 
-{
+Node *addCustomer(Node *root){
     Node *newNode = getNewNode(root);
     
     if(isEmpty(root)){
@@ -375,11 +388,14 @@ void display1Flight(FlightReservation flight) {
 }
 
 void displayCustomerFlights(Customer customer) {
-    cout << "Flights reserved for customer " << customer.name << endl;
-    for (int i = 0; i < customer.flightCounter; i++) {
+	cout << endl;
+    cout << "Flights reserved for customer ";
+	cout << customer.name << ":" << endl;
+    cout << endl;
+    
+    for(int i = 0; i < customer.flightCounter; i++) {
         cout << "__________Flight " << (i + 1) << "__________" << endl;
         display1Flight(customer.flights[i]);
-        cout << endl;
     }
 }
 
@@ -390,15 +406,17 @@ void display1Customer(Customer &customer){
 	cout << "Age: " << customer.age << endl;
 	cout << "Mobile Number: " << customer.mobileNumber << endl;
 	displayCustomerFlights(customer);
+	cout << endl;
 }
 
-void displayAllCustomers(Node *root , int &order)
-{
+void displayAllCustomers(Node *root , int &order){
     if(isEmpty(root))
         return;
     displayAllCustomers(root->left, order);
+    
     cout << "__________Customer " << order++ << " information__________" << endl;
     display1Customer(root->customer);
+    
     displayAllCustomers(root->right, order);
 }
 
@@ -449,23 +467,21 @@ int main()
 	   			id = inputInt("Customer ID to update");
 	   			customer = searchCustomer(root, id);
 	   				   			
-	   			if(isCorrect(customer.id))
+	   			if(isCorrect(customer.id)){
 	   				updateCustomerInfo(customer);
-	   			else
-	   				continue;
-                break;  
+	   			}
+	   			
+	   			continue;
                 
             case 3: 
             	if(isEmpty(root)){
 	   				emptySystem();
 	   				continue;
-				}            		
-            	else{
-            		order = 1;
-            		displayAllCustomers(root, order);
-            		cout << "--------------------------------------" << endl;
-				}
-            		
+				} 
+				
+        		order = 1;
+        		displayAllCustomers(root, order);
+        		cout << "--------------------------------------" << endl;
             	break;
             	
             case 4:
@@ -477,11 +493,14 @@ int main()
 	   			id = inputInt("Customer ID to display his flights information");
 	   			customer = searchCustomer(root, id);
 	   			
-	   			if(isCorrect(customer.id))
-	   				displayCustomerFlights(customer);
-	   			else
+	   			if(!isCorrect(customer.id)){
 	   				continue;
-                break;
+				}
+				
+				displayCustomerFlights(customer);
+	   			cout << "----------------------------" << endl;
+				break;
+	   			
                 
             case 5:
                 cout << "Exiting the system .. Thank you.";
